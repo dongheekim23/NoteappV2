@@ -9,17 +9,37 @@ import android.provider.BaseColumns
 import android.util.Log
 import com.kdonghee.noteappv2.item.ItemUtils
 import com.kdonghee.noteappv2.item.NoteItem
+import kotlin.properties.Delegates
 
 const val DATABASE_NAME = "notelist.db"
 const val DATABASE_VERSION = 2
 
 const val SECONDARY_TABLE_NAME = "noteList2"
 
+interface TableNameChangeListener {
+
+    fun onTableNameChanged(newName: String)
+}
+
 class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
 
-        var currentTableName: String = NoteEntry.TABLE_NAME
+        // TODO: Move these static variables and functions to another place
+
+        private val tableNameChangeListeners: MutableSet<TableNameChangeListener> = mutableSetOf()
+
+        fun registerTableNameChangeListener(listener: TableNameChangeListener) {
+            tableNameChangeListeners.add(listener)
+        }
+
+        fun deregisterTableNameChangeListener(listener: TableNameChangeListener) {
+            tableNameChangeListeners.remove(listener)
+        }
+
+        var currentTableName: String by Delegates.observable(NoteEntry.TABLE_NAME) { _, _, newValue ->
+            tableNameChangeListeners.forEach { it.onTableNameChanged(newValue) }
+        }
             private set
     }
 
