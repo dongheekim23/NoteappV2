@@ -18,8 +18,6 @@ class AddItemActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_add_item)
 
-        supportActionBar?.title = "Add Item"
-
         val noteDBHelper = NoteDBHelper(this)
 
         val confirmButton: Button = findViewById(R.id.button_confirm)

@@ -8,10 +8,11 @@
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/name_edit_text"
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textSize="30sp"
+        android:hint="Input item name"
         android:layout_weight="1"/>
 
     <androidx.appcompat.widget.AppCompatButton

@@ -11,7 +11,8 @@
         android:theme="@style/Theme.NoteappV2">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="Note List">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,8 +20,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AddItemActivity">
-
+        <activity
+            android:name=".AddItemActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="Add Item">
         </activity>
     </application>
 
