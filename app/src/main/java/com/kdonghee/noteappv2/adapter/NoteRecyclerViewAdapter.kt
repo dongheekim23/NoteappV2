@@ -109,7 +109,10 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
                 }
 
                 adapterItems.add(item)
-                notifyItemInserted(adapterItems.size - 1)
+                val indexOfInsertedItem = adapterItems.size - 1
+                notifyItemInserted(indexOfInsertedItem)
+
+                recyclerView?.scrollToPosition(indexOfInsertedItem)
             }
             ItemStatus.REMOVED -> {
                 val index = adapterItems.indexOfFirst { it.id == item?.id }
@@ -127,5 +130,10 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
                 notifyItemRangeRemoved(0, adapterItemSize)
             }
         }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
     }
 }
