@@ -69,12 +69,28 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             put(NoteEntry.COLUMN_NAME, name)
             put(NoteEntry.COLUMN_AMOUNT, amount)
         }
-        val rowId = db.insert(DBTableUtils.currentTableName, null, contentValues)
+        val itemId = db.insert(DBTableUtils.currentTableName, null, contentValues)
         db.close()
 
         Log.i("dh5031", "${Thread.currentThread().name} - addItem()")
 
-        return NoteItem(rowId, name, amount)
+        return NoteItem(itemId, name, amount)
+    }
+
+    @Synchronized
+    fun updateItem(updatedName: String, updatedAmount: Int, itemId: Long): NoteItem {
+        val db = writableDatabase
+        val contentValues = ContentValues().apply {
+            put(NoteEntry.COLUMN_NAME, updatedName)
+            put(NoteEntry.COLUMN_AMOUNT, updatedAmount)
+        }
+
+        db.update(DBTableUtils.currentTableName, contentValues, "${BaseColumns._ID} = $itemId", null)
+        db.close()
+
+        Log.i("dh5031", "${Thread.currentThread().name} - updateItem()")
+
+        return NoteItem(itemId, updatedName, updatedAmount)
     }
 
     @Synchronized

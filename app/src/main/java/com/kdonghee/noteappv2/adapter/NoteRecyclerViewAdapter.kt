@@ -13,10 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kdonghee.noteappv2.R
 import com.kdonghee.noteappv2.database.NoteDBHelper
 import com.kdonghee.noteappv2.database.NoteEntry
-import com.kdonghee.noteappv2.item.ItemChangeListener
-import com.kdonghee.noteappv2.item.ItemStatus
-import com.kdonghee.noteappv2.item.ItemUtils
-import com.kdonghee.noteappv2.item.NoteItem
+import com.kdonghee.noteappv2.item.*
 import com.kdonghee.noteappv2.thread.ThreadPoolManager
 
 class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper: NoteDBHelper)
@@ -64,7 +61,7 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteRecyclerViewHolder {
         val inflatedItemView = LayoutInflater.from(context).inflate(R.layout.item_view, parent, false)
-        val viewHolder = NoteRecyclerViewHolder(inflatedItemView, dbHelper)
+        val viewHolder = NoteRecyclerViewHolder(inflatedItemView, context, dbHelper)
         viewHolder.imageView.setImageResource(R.drawable.small_arrow_icon)
 
         return viewHolder
@@ -81,7 +78,8 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
 
     override fun getItemCount() = adapterItems.size
 
-    class NoteRecyclerViewHolder(itemView: View, dbHelper: NoteDBHelper) : RecyclerView.ViewHolder(itemView) {
+    class NoteRecyclerViewHolder(itemView: View, private val context: Context,
+                                 private val noteDBHelper: NoteDBHelper) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.note_item_image)
         val firstTextView: TextView = itemView.findViewById(R.id.note_item_first_text)
         val secondTextView: TextView = itemView.findViewById(R.id.note_item_second_text)
@@ -96,11 +94,15 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
                 }
                 ThreadPoolManager.execute {
                     val itemId = itemView.tag as Long
-                    dbHelper.removeItem(itemId)
+                    noteDBHelper.removeItem(itemId)
                     ThreadPoolManager.submitOnMainThread {
                         ItemUtils.notifyItemChanged(itemId, ItemStatus.REMOVED)
                     }
                 }
+            }
+
+            firstTextView.setOnClickListener {
+                ItemUtils.createAndShowItemDialog(context, noteDBHelper, DialogPurpose.UPDATE, itemView.tag as Long)
             }
         }
     }
@@ -118,6 +120,16 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
                 notifyItemInserted(indexOfInsertedItem)
 
                 recyclerView?.scrollToPosition(indexOfInsertedItem)
+            }
+            ItemStatus.UPDATED -> {
+                if (item == null) {
+                    Log.e("dh5031", "Updated item is null! Do not perform update operation")
+                    return
+                }
+
+                val index = adapterItems.indexOfFirst { it.id == item.id }
+                adapterItems[index] = item
+                notifyItemChanged(index)
             }
             ItemStatus.CLEARED -> {
                 val adapterItemSize = adapterItems.size

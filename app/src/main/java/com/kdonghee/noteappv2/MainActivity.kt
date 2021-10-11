@@ -1,21 +1,16 @@
 package com.kdonghee.noteappv2
 
-import android.content.Context
-import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kdonghee.noteappv2.adapter.NoteRecyclerViewAdapter
 import com.kdonghee.noteappv2.database.*
+import com.kdonghee.noteappv2.item.DialogPurpose
 import com.kdonghee.noteappv2.item.ItemStatus
 import com.kdonghee.noteappv2.item.ItemUtils
 import com.kdonghee.noteappv2.item.NoteItem
@@ -64,7 +59,7 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
         val addButton: Button = findViewById(R.id.add_button)
         addButton.setOnClickListener {
             //startActivity(Intent(this, AddItemActivity::class.java))
-            createAndShowAddItemDialog(this, dbHelper)
+            ItemUtils.createAndShowItemDialog(this, dbHelper, DialogPurpose.ADD)
         }
 
         val addRandomButton: Button = findViewById(R.id.add_random_button)
@@ -99,43 +94,6 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
     override fun onDestroy() {
         super.onDestroy()
         DBTableUtils.deregisterTableNameChangeListener(this)
-    }
-
-    private fun createAndShowAddItemDialog(context: Context, noteDBHelper: NoteDBHelper) {
-        val editTextContainer = LayoutInflater.from(context).inflate(R.layout.item_add_edit_text, null)
-        val editText: EditText = editTextContainer.findViewById(R.id.add_item_edit_text)
-
-        val addItemDialog = AlertDialog.Builder(this).create()
-        addItemDialog.apply {
-            setView(editTextContainer)
-            setTitle("Add Item")
-            setCancelable(true)
-
-            setButton(DialogInterface.BUTTON_POSITIVE, "Add") clickListener@ { _, _ ->
-                val inputEditText = editText.text.trim().toString()
-                if (inputEditText.isEmpty()) {
-                    Toast.makeText(context, "Enter a word!", Toast.LENGTH_SHORT).show()
-                    return@clickListener
-                }
-
-                ThreadPoolManager.execute {
-                    val item = noteDBHelper.addItem(inputEditText, (1..10).random())
-
-                    ThreadPoolManager.submitOnMainThread {
-                        Log.i("dh5031", "${Thread.currentThread().name} - notifyItemChanged(item, ItemStatus.ADDED)")
-                        ItemUtils.notifyItemChanged(item, ItemStatus.ADDED)
-                    }
-                }
-
-                dismiss()
-            }
-
-            setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel") { _, _ ->
-                dismiss()
-            }
-        }
-
-        addItemDialog.show()
     }
 
     override fun onTableNameChanged(newName: String) {
