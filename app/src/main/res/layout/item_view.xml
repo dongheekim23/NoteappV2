@@ -29,4 +29,11 @@
         android:layout_toEndOf="@id/note_item_image"
         android:layout_below="@id/note_item_first_text"/>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/remove_this_item_button"
+        android:text="X"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"/>
+
 </RelativeLayout>

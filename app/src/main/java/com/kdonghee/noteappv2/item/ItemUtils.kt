@@ -3,6 +3,8 @@ package com.kdonghee.noteappv2.item
 interface ItemChangeListener {
 
     fun onItemChanged(item: NoteItem?, status: ItemStatus)
+
+    fun onItemChanged(itemId: Long, status: ItemStatus)
 }
 
 enum class ItemStatus {
@@ -31,5 +33,9 @@ object ItemUtils {
 
     fun notifyItemChanged(item: NoteItem?, status: ItemStatus) {
         itemChangeListeners.forEach { it.onItemChanged(item, status) }
+    }
+
+    fun notifyItemChanged(itemId: Long, status: ItemStatus) {
+        itemChangeListeners.forEach { it.onItemChanged(itemId, status) }
     }
 }

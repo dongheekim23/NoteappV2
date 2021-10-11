@@ -15,11 +15,6 @@ const val DATABASE_VERSION = 2
 
 const val SECONDARY_TABLE_NAME = "noteList2"
 
-interface TableNameChangeListener {
-
-    fun onTableNameChanged(newName: String)
-}
-
 class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {

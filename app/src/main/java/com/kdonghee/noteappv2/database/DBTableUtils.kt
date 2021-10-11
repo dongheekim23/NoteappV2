@@ -2,6 +2,11 @@ package com.kdonghee.noteappv2.database
 
 import kotlin.properties.Delegates
 
+interface TableNameChangeListener {
+
+    fun onTableNameChanged(newName: String)
+}
+
 object DBTableUtils {
 
     private val tableNameChangeListeners: MutableSet<TableNameChangeListener> = mutableSetOf()

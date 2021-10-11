@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -63,22 +64,8 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteRecyclerViewHolder {
         val inflatedItemView = LayoutInflater.from(context).inflate(R.layout.item_view, parent, false)
-        val viewHolder = NoteRecyclerViewHolder(inflatedItemView)
+        val viewHolder = NoteRecyclerViewHolder(inflatedItemView, dbHelper)
         viewHolder.imageView.setImageResource(R.drawable.small_arrow_icon)
-
-        inflatedItemView.setOnClickListener { view ->
-            val index = viewHolder.adapterPosition
-            if (index < 0) {
-                Log.e("dh5031", "Trying to click on view which is being removed!")
-                return@setOnClickListener
-            }
-            ThreadPoolManager.execute {
-                dbHelper.removeItem(adapterItems[index].id)
-                ThreadPoolManager.submitOnMainThread {
-                    ItemUtils.notifyItemChanged(adapterItems[index], ItemStatus.REMOVED)
-                }
-            }
-        }
 
         return viewHolder
     }
@@ -94,10 +81,28 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
 
     override fun getItemCount() = adapterItems.size
 
-    class NoteRecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class NoteRecyclerViewHolder(itemView: View, dbHelper: NoteDBHelper) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.note_item_image)
         val firstTextView: TextView = itemView.findViewById(R.id.note_item_first_text)
         val secondTextView: TextView = itemView.findViewById(R.id.note_item_second_text)
+        private val removeItemButton: Button = itemView.findViewById(R.id.remove_this_item_button)
+
+        init {
+            removeItemButton.setOnClickListener {
+                val index = adapterPosition
+                if (index < 0) {
+                    Log.e("dh5031", "Trying to click on view which is being removed!")
+                    return@setOnClickListener
+                }
+                ThreadPoolManager.execute {
+                    val itemId = itemView.tag as Long
+                    dbHelper.removeItem(itemId)
+                    ThreadPoolManager.submitOnMainThread {
+                        ItemUtils.notifyItemChanged(itemId, ItemStatus.REMOVED)
+                    }
+                }
+            }
+        }
     }
 
     override fun onItemChanged(item: NoteItem?, status: ItemStatus) {
@@ -114,8 +119,19 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
 
                 recyclerView?.scrollToPosition(indexOfInsertedItem)
             }
+            ItemStatus.CLEARED -> {
+                val adapterItemSize = adapterItems.size
+                adapterItems.clear()
+                notifyItemRangeRemoved(0, adapterItemSize)
+            }
+            else -> return
+        }
+    }
+
+    override fun onItemChanged(itemId: Long, status: ItemStatus) {
+        when (status) {
             ItemStatus.REMOVED -> {
-                val index = adapterItems.indexOfFirst { it.id == item?.id }
+                val index = adapterItems.indexOfFirst { it.id == itemId }
                 /*if (index < 0) {
                     Log.e("dh5031", "Item with the given ID cannot be found!")
                     return
@@ -124,11 +140,7 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
                 adapterItems.removeAt(index)
                 notifyItemRemoved(index)
             }
-            ItemStatus.CLEARED -> {
-                val adapterItemSize = adapterItems.size
-                adapterItems.clear()
-                notifyItemRangeRemoved(0, adapterItemSize)
-            }
+            else -> return
         }
     }
 
