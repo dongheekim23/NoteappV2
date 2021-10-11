@@ -2,26 +2,20 @@ package com.kdonghee.noteappv2
 
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.marginLeft
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kdonghee.noteappv2.adapter.NoteRecyclerViewAdapter
-import com.kdonghee.noteappv2.database.NoteDBHelper
-import com.kdonghee.noteappv2.database.NoteEntry
-import com.kdonghee.noteappv2.database.SECONDARY_TABLE_NAME
-import com.kdonghee.noteappv2.database.TableNameChangeListener
+import com.kdonghee.noteappv2.database.*
 import com.kdonghee.noteappv2.item.ItemStatus
 import com.kdonghee.noteappv2.item.ItemUtils
 import com.kdonghee.noteappv2.item.NoteItem
@@ -35,7 +29,7 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        NoteDBHelper.registerTableNameChangeListener(this)
+        DBTableUtils.registerTableNameChangeListener(this)
 
         val recyclerView: RecyclerView = findViewById(R.id.note_recycler_view)
         val dbHelper = NoteDBHelper(this)
@@ -65,7 +59,7 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
         }).attachToRecyclerView(recyclerView)
 
         titleTextView = findViewById(R.id.note_title)
-        titleTextView?.text = NoteDBHelper.currentTableName
+        titleTextView?.text = DBTableUtils.currentTableName
 
         val addButton: Button = findViewById(R.id.add_button)
         addButton.setOnClickListener {
@@ -97,14 +91,14 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
 
         val changeTableButton: Button = findViewById(R.id.change_table_button)
         changeTableButton.setOnClickListener {
-            dbHelper.swapTables()
+            DBTableUtils.swapTables()
             adapter.updateAdapterItems()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        NoteDBHelper.deregisterTableNameChangeListener(this)
+        DBTableUtils.deregisterTableNameChangeListener(this)
     }
 
     private fun createAndShowAddItemDialog(context: Context, noteDBHelper: NoteDBHelper) {

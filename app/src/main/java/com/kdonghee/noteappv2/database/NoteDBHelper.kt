@@ -9,7 +9,6 @@ import android.provider.BaseColumns
 import android.util.Log
 import com.kdonghee.noteappv2.item.ItemUtils
 import com.kdonghee.noteappv2.item.NoteItem
-import kotlin.properties.Delegates
 
 const val DATABASE_NAME = "notelist.db"
 const val DATABASE_VERSION = 2
@@ -22,26 +21,6 @@ interface TableNameChangeListener {
 }
 
 class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-
-    companion object {
-
-        // TODO: Move these static variables and functions to another place
-
-        private val tableNameChangeListeners: MutableSet<TableNameChangeListener> = mutableSetOf()
-
-        fun registerTableNameChangeListener(listener: TableNameChangeListener) {
-            tableNameChangeListeners.add(listener)
-        }
-
-        fun deregisterTableNameChangeListener(listener: TableNameChangeListener) {
-            tableNameChangeListeners.remove(listener)
-        }
-
-        var currentTableName: String by Delegates.observable(NoteEntry.TABLE_NAME) { _, _, newValue ->
-            tableNameChangeListeners.forEach { it.onTableNameChanged(newValue) }
-        }
-            private set
-    }
 
     override fun onCreate(db: SQLiteDatabase) {
         val SQL_CREATE_NOTE_LIST_TABLE = "CREATE TABLE " +
@@ -69,10 +48,6 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
         onCreate(db)
     }
 
-    fun swapTables() {
-        currentTableName = if (currentTableName == NoteEntry.TABLE_NAME) SECONDARY_TABLE_NAME else NoteEntry.TABLE_NAME
-    }
-
     @Synchronized
     fun addRandomItem(): NoteItem {
         val db = writableDatabase
@@ -84,7 +59,7 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             put(NoteEntry.COLUMN_NAME, newItemName)
             put(NoteEntry.COLUMN_AMOUNT, newItemAmount)
         }
-        val rowId = db.insert(currentTableName, null, contentValues)
+        val rowId = db.insert(DBTableUtils.currentTableName, null, contentValues)
         db.close()
 
         Log.i("dh5031", "${Thread.currentThread().name} - addRandomItem()")
@@ -99,7 +74,7 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
             put(NoteEntry.COLUMN_NAME, name)
             put(NoteEntry.COLUMN_AMOUNT, amount)
         }
-        val rowId = db.insert(currentTableName, null, contentValues)
+        val rowId = db.insert(DBTableUtils.currentTableName, null, contentValues)
         db.close()
 
         Log.i("dh5031", "${Thread.currentThread().name} - addItem()")
@@ -111,7 +86,7 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
     fun removeItem(rowId: Long) {
         val db = writableDatabase
 
-        db.delete(currentTableName, "${BaseColumns._ID} = $rowId", null)
+        db.delete(DBTableUtils.currentTableName, "${BaseColumns._ID} = $rowId", null)
         db.close()
 
         Log.i("dh5031", "${Thread.currentThread().name} - removeItem()")
@@ -121,7 +96,7 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
     fun clearAllItems() {
         val db = writableDatabase
 
-        db.delete(currentTableName, null, null)
+        db.delete(DBTableUtils.currentTableName, null, null)
         db.close()
 
         Log.i("dh5031", "${Thread.currentThread().name} - clearAllItems()")
@@ -131,6 +106,6 @@ class NoteDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
     fun getAllItems(db: SQLiteDatabase): Cursor {
         Log.i("dh5031", "${Thread.currentThread().name} - getAllItems()")
 
-        return db.rawQuery("SELECT * FROM $currentTableName", null)
+        return db.rawQuery("SELECT * FROM ${DBTableUtils.currentTableName}", null)
     }
 }
