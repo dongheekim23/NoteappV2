@@ -24,7 +24,19 @@ object DBTableUtils {
         tableNameChangeListeners.remove(listener)
     }
 
+    fun getTableNameList(): List<String> {
+        return listOf("noteList", "noteList2")
+    }
+
     fun swapTables() {
         currentTableName = if (currentTableName == NoteEntry.TABLE_NAME) SECONDARY_TABLE_NAME else NoteEntry.TABLE_NAME
+    }
+
+    fun changeTableTo(newTableName: String) {
+        if (currentTableName == newTableName) {
+            return
+        }
+
+        currentTableName = newTableName
     }
 }

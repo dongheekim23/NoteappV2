@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/table_list_view_title"
+        android:textSize="25sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Table List"
+        android:layout_marginBottom="5dp"/>
+
+    <ListView
+        android:id="@+id/table_list_view"
+        android:background="@drawable/outline_rectangle_blue"
+        android:layout_below="@id/table_list_view_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"/>
+
+</RelativeLayout>

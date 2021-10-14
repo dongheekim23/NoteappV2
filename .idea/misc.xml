@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.29739583333333336" />
+        <entry key="../../Library/Android/sdk/platforms/android-31/data/res/layout/simple_list_item_1.xml" value="0.223731884057971" />
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/drawable-night/outline.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/drawable/ic_launcher_background.xml" value="0.22083333333333333" />
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/drawable/outline.xml" value="0.38229166666666664" />
@@ -10,6 +12,8 @@
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/layout/item_add_edit_text.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/kenbl/AndroidStudioProjects/NoteappV2/app/src/main/res/layout/item_view.xml" value="0.36614583333333334" />
+        <entry key="app/src/main/res/layout/table_list_layout.xml" value="0.223731884057971" />
+        <entry key="app/src/main/res/layout/table_view.xml" value="0.223731884057971" />
       </map>
     </option>
   </component>

@@ -86,8 +86,9 @@ class MainActivity : AppCompatActivity(), TableNameChangeListener {
 
         val changeTableButton: Button = findViewById(R.id.change_table_button)
         changeTableButton.setOnClickListener {
-            DBTableUtils.swapTables()
-            adapter.updateAdapterItems()
+            //DBTableUtils.swapTables()
+            //adapter.updateAdapterItems()
+            ChooseTableAlertDialog.newInstance(this, DBTableUtils.getTableNameList()).show()
         }
     }
 

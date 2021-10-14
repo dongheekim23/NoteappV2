@@ -11,13 +11,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kdonghee.noteappv2.R
+import com.kdonghee.noteappv2.database.DBTableUtils
 import com.kdonghee.noteappv2.database.NoteDBHelper
 import com.kdonghee.noteappv2.database.NoteEntry
+import com.kdonghee.noteappv2.database.TableNameChangeListener
 import com.kdonghee.noteappv2.item.*
 import com.kdonghee.noteappv2.thread.ThreadPoolManager
 
 class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper: NoteDBHelper)
-    : RecyclerView.Adapter<NoteRecyclerViewAdapter.NoteRecyclerViewHolder>(), ItemChangeListener {
+    : RecyclerView.Adapter<NoteRecyclerViewAdapter.NoteRecyclerViewHolder>(),
+    ItemChangeListener, TableNameChangeListener {
 
     private var adapterItems: MutableList<NoteItem> = mutableListOf()
     private var recyclerView: RecyclerView? = null
@@ -25,9 +28,10 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
     init {
         updateAdapterItems()
         ItemUtils.registerItemChangeListener(this)
+        DBTableUtils.registerTableNameChangeListener(this)
     }
 
-    fun updateAdapterItems() {
+    private fun updateAdapterItems() {
         if (adapterItems.isNotEmpty()) {
             val adapterItemsSize = adapterItems.size
             adapterItems.clear()
@@ -159,5 +163,9 @@ class NoteRecyclerViewAdapter(private val context: Context, private val dbHelper
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
+    }
+
+    override fun onTableNameChanged(newName: String) {
+        updateAdapterItems()
     }
 }
